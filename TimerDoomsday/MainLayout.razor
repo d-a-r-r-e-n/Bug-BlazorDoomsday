@@ -1,5 +1,52 @@
 ﻿@inherits LayoutComponentBase
 
-<main>
-    @Body
-</main>
+<div>
+    Timer halts at approximately 03-Jun-2023 06:44:23 (UTC)
+    <ol>
+        <li>Before running, set the system clock to a time shortly before this "time of death" (being mindful of the active timezone)</li>
+        <li>Upon launch, click "Start" and watch the timestamp below update each time the timer fires</li>
+    </ol>
+    <div>@Time</div>
+    <div>
+        <button type="button" @onclick="OnStartClicked">Start</button>
+        <button type="button" @onclick="OnStopClicked">Stop</button>
+    </div>
+</div>
+
+@code {
+
+#nullable disable
+
+    Timer _timer;
+
+    string Time
+    { get; set; }
+
+    void RefreshTime()
+    {
+        Time = $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fff} (UTC)";
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        RefreshTime();
+        _timer = new Timer(OnTimer);
+    }
+
+    void OnStartClicked()
+    {
+        _timer.Change(0, 500);
+    }
+
+    void OnStopClicked()
+    {
+        _timer.Change(-1, 0);
+    }
+
+    void OnTimer(object state)
+    {
+        RefreshTime();
+        StateHasChanged();
+    }
+}
